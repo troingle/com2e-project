@@ -17,7 +17,7 @@ card_values = {
     "Ace": 11
     }
 
-class Card():
+class Card(): # a singular card, contains rank and suit
     def __init__(self, rank, suit):
         self.rank = rank
         self.value = card_values[rank]
@@ -25,7 +25,7 @@ class Card():
     def __str__(self): 
         return f"{self.rank} of {self.suit}"
 
-class Deck():
+class Deck(): # the entire deck
     def get_cards(self): # get deck from txt file
         self.cards = []
         file = open(pathlib.Path("") / "deck.txt")
@@ -34,17 +34,18 @@ class Deck():
                 rank = line.split(" of ")[0].strip()
                 suit = line.split(" of ")[1].strip()
                 self.cards.append(Card(rank, suit))
-            except: raise Exception("Invalid deck data") # raise an exception if there is an error
+            except: raise Exception("Invalid deck data") # raise an exception if there is an error in the file
         random.shuffle(self.cards)
-    def __init__(self):
+
+    def __init__(self): # generate deck at first
         self.get_cards()
     def draw_top_card(self): # draw card and remove it from the deck
         return self.cards.pop(0)
 
-class Hand():
+class Hand(): # 
     def __init__(self):
         self.cards = []
-    def __str__(self):
+    def __str__(self): # formats the hand nicely when printed
         card_strings = []
         for card in self.cards:
             card_strings.append(str(card))
@@ -55,8 +56,7 @@ class Hand():
     def add_card(self, card):
         self.cards.append(card)
 
-    def total_value(self):
-        # count total points of all cards in hand
+    def total_value(self): # count total points of all cards in hand
         total = 0
         ace_count = 0
         for card in self.cards:
@@ -71,8 +71,7 @@ class Hand():
     
         return total
 
-def main():
-    # basic game loop
+def main(): # basic game loop
     deck = Deck()
     dealer_hand = Hand()
     hand = Hand()
@@ -124,11 +123,10 @@ def main():
     else: # any other scenario is a loss
         print("You lost!")
 
-def check_for_card():
+def check_for_card(): # uses sequential search to look for target card
     print()
     target_card = input("Enter card name (e.g. '7 of Hearts'): ")
 
-    # sequential search to look for target card
     file = open(pathlib.Path("") / "deck.txt")
     matches = 0
     for line in file: 
@@ -141,8 +139,7 @@ def check_for_card():
 
     print()
 
-
-if __name__ == "__main__":
+if __name__ == "__main__": # the menu: allows the player to choose to either play, check for a card or quit
     while True:
         decision = input("Welcome to Blackjack!\n- 1 to play\n- 2 to check deck for a specific card\n- 3 to quit\n")
         if decision == "1":
