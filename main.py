@@ -72,8 +72,6 @@ class Hand():
         return total
 
 def main():
-    print("Welcome to Blackjack!\n")
-
     # basic game loop
     deck = Deck()
     dealer_hand = Hand()
@@ -97,7 +95,7 @@ def main():
             print(f"Your hand: {hand}")
             if hand.total_value() > 21: # busting loses you the game instantly
                 print("Bust! You lost!")
-                quit()
+                return
         elif decision == "s": break
         else: print("Invalid input, type h or s")
     print()
@@ -126,7 +124,32 @@ def main():
     else: # any other scenario is a loss
         print("You lost!")
 
-    quit()
+def check_for_card():
+    print()
+    target_card = input("Enter card name (e.g. '7 of Hearts'): ")
+
+    # sequential search to look for target card
+    file = open(pathlib.Path("") / "deck.txt")
+    matches = 0
+    for line in file: 
+        if line.strip().lower() == target_card.lower(): matches += 1
+    if matches > 0:
+        print("This card is in the deck!")
+        print(f"Found {matches} matches.")
+    else:
+        print("This card is not in the deck.")
+
+    print()
+
 
 if __name__ == "__main__":
-    main()
+    while True:
+        decision = input("Welcome to Blackjack!\n- 1 to play\n- 2 to check deck for a specific card\n- 3 to quit\n")
+        if decision == "1":
+            main()
+            print()
+            input("Input anything to proceed... ") # enter to continue
+        elif decision == "2":
+            check_for_card()
+        elif decision == "3":
+            quit()
