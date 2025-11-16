@@ -1,0 +1,244 @@
+* PLACEHOLDER
+** Overview
+   - The project allows you to increase your final grade by a maximum
+     of 3 grades (maximum level 3 in grading levels below)
+   - Your program must process text data in a meaningful way, but you
+     should not strive for a real-world application.
+   - Grading is based on
+     - specification
+     - correctness
+     - code clarity
+     - used data structures
+     - algorithms.
+   - An example is provided for you below.
+     - The example is relatively complicated. For example, it utilizes
+       a combination of binary and linear search to find animals whose
+       species starts with a given key. Because there is so little
+       data, linear search would have been sufficient.
+
+** Project deadline
+   The dealine of the project is <2025-11-16 Sun 23:59>.
+
+** Project submission
+   - Your submission consists of
+     1. one *PDF file* containing documentation
+        1. your target grade level (1, 2 or 3)
+        2. specification
+        3. test case with typical input
+        4. description of algorithms (for level 2)
+        5. description of use of lists (for level 2)
+        7. description of use of classes (for level 3)
+     2. one ~.py~-file containing the code
+     3. possibly one or more text data files needed for the test case.
+   - Submission is made via email by providing either
+     - one ~.zip~-archive containing all files, or
+     - a link to a GitHub repository containing all files.
+   - It is strongly suggested that you use documentation structure
+     similar to the example below, as this will make both your and my
+     life a lot easier.
+   
+** Grading levels
+*** Criteria for level 1
+**** Specification
+     - There is a sensible description of what the program does.
+     - The program reads input from the user and/or from text data
+       file(s) and performs a meaningful operation.
+     - Format of input is explained clearly.
+     - The input contains multiple items of data (multiple numbers, or
+       multiple lines of text, or similar).
+     - At least some of the data is read from the user or from a file
+       using a loop (~while~, ~for~).
+       - Note: There are /many/ ways to do this. Read multiple lines
+         from a file. Repeat the same operation multiple times for the
+         user. Read multiple lines from user input.
+**** Correctness
+     - The program works correctly in one documented test case with
+       typical input.
+     - If any text data files are required to test this, they are
+       supplied.
+     - If external packages (libraries) are used, file
+       =requirements.txt= is supplied so that packages can be easily
+       installed in a =venv. This file is (produced by running
+       #+begin_src sh :exports code
+         pythom -m pip freeze > requirements.txt
+       #+end_src
+       in the terminal.
+**** Code clarity
+     - There is no unnecessary whitespace (no extra empty lines or
+       extra spaces).
+     - Identifiers (names of variables, constants and functions) are
+       meaningful in the context of the program.
+*** Additional criteria for level 2
+**** Non-trivial algorithms
+     Program includes at least one non-trivial algorithm. This could
+     be searching or sorting or something else.
+**** Lists
+     Program uses at least one list in a meaningful way.
+**** Code clarity
+     - All non-trivial parts of the code are
+       commented. \ldquo{}Non-trivial\rdquo is defined by assuming
+       that the reader is a fellow student.
+     - The flow of the program is split into meaningful functions.
+     - The role of defined functions is explained in comments.
+*** Additional criteria for level 3
+**** Classes
+     Program includes at least one programmer-defined class.
+** Example project
+*** Documentation
+**** Target assessment level
+     Target assessment level of this work is 3.
+**** Specification
+***** What does the program do?
+      The program
+      1. reads data about animals from a file
+      2. allows user to search for animals based on its species; for
+         each given key (single word), the program prints all those
+         animals whose species start with the key.
+***** Data format
+****** Data file
+       The input data text file consists of lines, each line
+       containing
+       #+begin_center
+       =category weight species=
+       #+end_center
+       =category= is a single word, =weight= is an integer, and
+       =species= is the rest of the line.
+****** User input
+       User input consists of either =!= (terminates program), or a
+       string =key= which is used to find animals whose species starts
+       with =key=.
+**** Correctness
+***** Typical test case
+      File [[file:animals.txt]] contains data from 4 animals. The
+      following is a script obtained when running the program
+
+      #+begin_example
+        Please give search key (! to quit): s
+        salmon (fish) 13
+        sea turtle (reptile) 900
+        Please give search key (! to quit): sea
+        sea turtle (reptile) 900
+        Please give search key (! to quit): seat
+        <key not found>
+        Please give search key (! to quit): a
+        albatross (bird) 7
+        Please give search key (! to quit): b
+        blue whale (mammal) 1600
+        Please give search key (! to quit): x
+        <key not found>
+        Please give search key (! to quit): !
+      #+end_example
+**** Non-trivial algorithms
+***** Selection sort
+      Data is sorted in lexicographic order according to species name
+      using selection sort.
+***** Searching
+      Animals whose species starts with given key are searched for
+      using a combination of binary search (for one value) and then a
+      form of linear search to extend to all animals matching the key
+      around the point where the first match was found.
+**** Lists
+     - Animals are stored into list for sorting and binary search.
+     - A list is used read an unspecified amount of data from the data
+       file.
+     - A list is also used to return an unspecified number of search
+       results.
+**** Classes
+     A class is used to store the data of each animal.
+*** Program code (provided here just for ease of reading, would be a separate file in your submission)
+    #+begin_src python :exports code :tangle main.py
+      import pathlib
+
+      class Animal:
+          def __init__(self, species, category, weight):
+              self.species = species
+              self.category = category
+              self.weight = weight
+
+          def __str__ (self):
+              return f'{self.species} ({self.category}) {self.weight}'
+
+      # read animals from given file name, return array of animals
+      def read_animals(file_path):
+          animal_list = []
+
+          # open file as a resource
+          with open(file_path) as f:
+              # traverse lines in file
+              for line in f:
+                  # each line has category, weight, species
+                  words = line.split()
+                  category = words[0]
+                  weight = int(words[1])
+                  # species is the rest of the line, with possible leading and
+                  # trailing whitespace trimmed
+                  species = ' '.join(words[2:]).strip()
+                  animal_list.append(Animal(species, category, weight))
+
+          return animal_list
+
+      # sort animals according to species into lexicographic order, in-place
+      def sort_animals(animals):
+          # selection sort according to species name
+          for i in range(len(animals)):
+              smallest_ind = i
+              for j in range(i + 1, len(animals)):
+                  if animals[j].species < animals[smallest_ind].species:
+                      smallest_ind = j
+
+              # swap if smallest found is not at index i
+              if smallest_ind != i:
+                  (animals[i], animals[smallest_ind]) = (animals[smallest_ind], animals[i])
+
+      # return a list of animals whose species start with key
+      def search_animals(animals, key):
+          # binary search for one animal matching key
+          lo = 0
+          hi = len(animals) - 1
+          found_ind = -1 # index of found animal, negative if none found
+
+          while lo <= hi:
+              mid = (lo + hi) // 2
+              animal = animals[mid]
+              if animal.species.startswith(key):
+                  found_ind = mid
+                  break
+              elif key < animal.species:
+                  hi = mid - 1
+              else:
+                  lo = mid + 1
+
+          animal_list = []
+          if found_ind >= 0:
+              # backtrack to first animal matching key
+              while found_ind > 0 and animals[found_ind - 1].species.startswith(key):
+                  found_ind -= 1
+
+              # add all animals matching key
+              while (found_ind < len(animals) and
+                     animals[found_ind].species.startswith(key)):
+                  animal_list.append(animals[found_ind])
+                  found_ind += 1
+          return animal_list
+
+      # read animals from file
+      FILENAME = 'animals.txt'
+      animals = read_animals(pathlib.Path(FILENAME))
+
+      # sort into increasing lexicographic order according to species
+      sort_animals(animals)
+
+      # search for animals whose species starts with given key; quit
+      # with input !
+      while True:
+          key = input('Please give search key (! to quit): ')
+          if key == '!':
+              break
+
+          animal_list = search_animals(animals, key)
+          if len(animal_list) == 0:
+              print('<key not found>')
+          else:
+              for a in animal_list:
+                  print(a)
+    #+end_src
